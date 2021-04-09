@@ -7,16 +7,16 @@ $(document).ready(function () {
 
 const uri = "/api/Movies"; //the api as a global variable
 // alert("API " + uri);
-let allStaff = null; //holds the data in a global
+let Movies = null; //holds the data in a global
 //Loads up the <p id="counter"> </p> with a count of the staff, data come from the LoadTable Function where this is called
 function getCount(data) {
     // alert("getcount " + datas);
-    const theCount = $("#counter"); //bind TheCount to the counter
+    const theCount = $("#counting"); //bind TheCount to the counter
     if (data) { //if any data exists
         // alert("We have data " + data);
-        theCount.text("There are " + data + " Staff");
+        theCount.text("There are " + data + " Movies");
     } else {
-        theCount.text("There are no Staff");
+        theCount.text("There are no Movies");
         alert("No data");
     }
 }
@@ -27,8 +27,8 @@ function LoadTable() {
         url: uri, //the uri from the global
         cache: false, //don't cache the data in browser reloads, get a fresh copy
         success: function (data) { //if the request succeeds ....
-            const tBody = $("#allStaff"); //for the tbody bind with allstaff <tbody id="allStaff"></tbody>
-            allStaff = data; //pass in all the data to the global allstaff use it in Edit
+            const tBody = $("#Movies"); //for the tbody bind with allstaff <tbody id="allStaff"></tbody>
+            Movies = data; //pass in all the data to the global allstaff use it in Edit
             $(tBody).empty(); //empty out old data
             getCount(data.length); //count for the counter function
             //a foreach through the rows creating table data
@@ -40,17 +40,17 @@ function LoadTable() {
                         .append($("<td></td>").text(item.genre))
                         .append($("<td></td>").text(item.rating))
                         .append($("<td></td>")
-                            .append($("<button href='#editEmployeeModal' class='btn-success' data-toggle='modal'><i class='material-icons' data-toggle='tooltip' title='Edit'>&#xE254;</i></button>)")
+                            .append($("<button href='#updateMovieModal' class='btn-success' data-toggle='modal'><i class='material-icons' data-toggle='tooltip' title='Edit'>&#xE254;</i></button>)")
                                 .on("click",
                                     function () {
-                                        editItem(item.id);
+                                        updateMovie(item.id);
                                     }) //in the empty cell append in an edititem button
                             )
                         )
                         .append(
                             $("<td></td>")
                                 .append(
-                                    $('<button  href="#deleteEmployeeModal" data-toggle="modal" class="btn-success" ><i class="material - icons" data-toggle="tooltip" title="Delete">&#xE872;</i></button>')
+                                    $('<button  href="#removeMovieModal" data-toggle="modal" class="btn-success" ><i class="material - icons" data-toggle="tooltip" title="Delete">&#xE872;</i></button>')
                                         .on("click", function () {
                                             $("#delete-id").val(item.id);
                                         }
@@ -64,7 +64,7 @@ function LoadTable() {
     });
 }
 //Add an person to the database
-function addItem() {
+function addMovie() {
     const item = {
         title: $("#add-title").val(),
         plot: $("#add-plot").val(),
@@ -88,12 +88,12 @@ function addItem() {
             $("#add-plot").val("");
             $("#add-genre").val("");
             $("#add-rating").val("");
-            alert("Staff added successfully");
+            alert("Movie added successfully");
         }
     });
 }
 //Delete a person from the database
-function deleteItem(id) {
+function RemoveMovie(id) {
 
     $.ajax({
         url: uri + "/" + id, //add the ID to the end of the URI
@@ -104,31 +104,35 @@ function deleteItem(id) {
     });
 }
 //click event for edit button to load details into form. Go through each entry held in allStaff and add in the one that matches the id from the click
-function editItem(id) {
-    $.each(allStaff,
+function updateMovie(id) {
+    
+    $.each(Movies,
         function (key, item) {
+                       
             if (item.id === id) {//where the ID == the one on the click
-                $("#edit-title").val(item.title); //add it to the form field
-                $("#edit-id").val(item.id);
-                $("#edit-plot").val(item.plot);
-                $("#edit-genre").val(item.genre);
-                $("#edit-rating").val(item.rating);;
+                $("#update-title").val(item.title); //add it to the form field
+                $("#update-id").val(item.id);
+                $("#update-plot").val(item.plot);
+                $("#update-genre").val(item.genre);
+                $("#update-rating").val(item.rating);;
             }
         });
 }
 //$(".my-form").on("submit", //saving the edit to the db
 function saveItem() {
+   
     const item = { //pass all the data on the form to a variable called item use later to send to server
-        title: $("#edit-title").val(),
-        plot: $("#edit-plot").val(),
-        genre: $("#edit-genre").val(),
-        rating: $("#edit-rating").val(),
-        id: $("#edit-id").val()
+        title: $("#update-title").val(),
+        plot: $("#update-plot").val(),
+        genre: $("#update-genre").val(),
+        rating: $("#update-rating").val(),
+        id: $("#update-id").val()
         
     };
-    alert("Successfully saved");
+    //alert(item.title + item.genre + item.plot + item.rating);
+    
     $.ajax({
-        url: uri + "/" + $("#edit-id").val(), //add the row id to the uri
+        url: uri + "/" +$("#update-id").val(), //add the row id to the uri
         type: "PUT", //send it to the PUT controller
         accepts: "application/json",
         contentType: "application/json",
@@ -137,9 +141,10 @@ function saveItem() {
             alert("Something went wrong!");
         },
         success: function (result) {
-
+             alert("Successfully updated");
             LoadTable(); //load the table afresh
-        }
-    });
+         }
+        
+     });
     return false;
 };
