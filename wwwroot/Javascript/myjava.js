@@ -1,16 +1,14 @@
 ﻿
-//run the LoadTable function when the page has loaded
+//load table function
 $(document).ready(function () {
-    //alert("hi"); checked the file is linked or not
     LoadTable();
 });
 
-const uri = "/api/Movies"; //the api as a global variable
+const uri = "/api/Movies"; //api is global variable and Movies is controller name
 // alert("API " + uri);
-let Movies = null; //holds the data in a global
-//Loads up the <p id="counter"> </p> with a count of the movies, data come from the LoadTable Function where this is called
+let Movies = null; //data holding function
 
-
+//hiding the addModal after adding movies
 function hide() {
     
        
@@ -26,7 +24,7 @@ function show() {
 
     
     
-
+//validation for choosing numbers only instead of alpabhets
 
 function validatation() {
  
@@ -43,43 +41,44 @@ function validatation() {
     }
 }
 
-    function getCount(data) {
-        // alert("getcount " + datas);
-        const theCount = $("#counting"); //bind TheCount to the counter
-        if (data) { //if any data exists
-            // alert("We have data " + data);
-            theCount.text("There are " + data + " Movies");
-        } else {
-            theCount.text("There are no Movies");
-            alert("No data");
-        }
-    }
-    //this function reloads the table of movies after any changes
+    //function getCount(data) {
+    //    // alert("getcount " + datas);
+    //    const theCount = $("#counting"); //bind TheCount to the counter
+    //    if (data) { //if any data exists
+    //        // alert("We have data " + data);
+    //        theCount.text("There are " + data + " Movies");
+    //    } else {
+    //        theCount.text("There are no Movies");
+    //        alert("No data");
+    //    }
+    //}
+    //load the table again after any changes
 function LoadTable() {
     
         $.ajax({
-            type: "GET", //use the GET controller
-            url: uri, //the uri from the global
-            cache: false, //don't cache the data in browser reloads, get a fresh copy
-            success: function (data) { //if the request succeeds ....
-                const tBody = $("#Movies"); //for the tbody bind with movies <tbody id="Movies"></tbody>
-                Movies = data; //pass in all the data to the global Movies use it in Edit
-                $(tBody).empty(); //empty out old data
-                getCount(data.length); //count for the counter function
+            type: "GET", //Get Controller
+            url: uri, //uri
+            cache: false, //use of cache to reload the fresh copy
+            success: function (data) { //when the function is successed
+                const tBody = $("#Movies"); //link (#Movies)with <tbody> 
+                Movies = data; //pass whole data to all movies 
+                $(tBody).empty(); //clear previous data
+                //getCount(data.length); //count for the counter function
                 //a foreach through the rows creating table data
                 $.each(data,
                     function (key, item) {
                         const tr = $("<tr></tr>")
-                            .append($("<td></td>").text(item.title)) //inserts content in the tags
+                            .append($("<td></td>").text(item.title)) //inserts items in the tags
                             .append($("<td></td>").text(item.plot))
                             .append($("<td></td>").text(item.genre))
                             .append($("<td></td>").text(item.rating))
                             .append($("<td></td>")
-                                .append($("<button href='#updateMovieModal' class='btn-info' data-toggle='modal'>Edit</button>)")
+                                .append($("<button href='#updateMovieModal' class='btn-info' data-toggle='modal'>update</button>)")
                                     .on("click",
+                                        //update function
                                         function () {
                                             updateMovie(item.id);
-                                        }) //in the empty cell append in an edititem button
+                                        }) //fill the empty cells in an updateMovie
                                 )
                             )
                             .append(
@@ -89,16 +88,16 @@ function LoadTable() {
                                             .on("click", function () {
                                                 $("#delete-id").val(item.id);
                                             }
-                                                //in an empty cell add in a deleteitem button
+                                                //fill empty cell in a RemoveMovie button
                                             )
                                     )
                             );
-                        tr.appendTo(tBody);//add all the rows to the tbody
+                        tr.appendTo(tBody);//append all rows to tbody
                     });
             }
         });
     }
-    //Add a movie to the database
+    //Add Movie function
 function addMovie() {
     
     
@@ -110,50 +109,51 @@ function addMovie() {
     };
     
         $.ajax({
-            type: "POST", //this calls the POST in the API controller
+            type: "POST", //this is for caaling the POST type in api controller
             accepts: "application/json",
             url: uri,
             contentType: "application/json",
             data: JSON.stringify(item),
-            //if there is an error
+            //Show error
             error: function (jqXHR, textStatus, errorThrown) {
                 alert("Something went wrong!");
             },
-            //if it is successful
+            //when succeceed
             success: function (result) {
                 
                 LoadTable();
-                $("#add-title").val(""); //clear entry boxes
+                $("#add-title").val(""); //clear out the filling cells
                 $("#add-plot").val("");
                 $("#add-genre").val("");
                 $("#add-rating").val("");
                 hide();
                 LoadTable();
+                //show alert after adding movie
                 alert("Movie added successfully");
                 LoadTable();
                 location.reload();
             }
         });
     }
-    //Delete a movie from the database
+    //use remove movie function to remove movies
     function RemoveMovie(id) {
 
         $.ajax({
-            url: uri + "/" + id, //add the ID to the end of the URI
-            type: "DELETE", //this calls the DELETE in the API controller
+            url: uri + "/" + id, //this is used for adding id to end of URI
+            type: "DELETE", //this is for calling the Delete in the API controller
             success: function (result) {
                 LoadTable();
             }
         });
     }
-    //click event for edit button to load details into form. Go through each entry held in movies and add in the one that matches the id from the click
+    //use updateMovie function
     function updateMovie(id) {
 
         $.each(Movies,
             function (key, item) {
 
-                if (item.id === id) {//where the ID == the one on the click
-                    $("#update-title").val(item.title); //add it to the form field
+                if (item.id === id) {//to find ID
+                    $("#update-title").val(item.title); //append in the form
                     $("#update-id").val(item.id);
                     $("#update-plot").val(item.plot);
                     $("#update-genre").val(item.genre);
@@ -161,10 +161,10 @@ function addMovie() {
                 }
             });
     }
-    //$(".my-form").on("submit", //saving the edit to the db
+    //save the movies after updating
     function saveItem() {
 
-        const item = { //pass all the data on the form to a variable called item use later to send to server
+        const item = { //passing the data
             title: $("#update-title").val(),
             plot: $("#update-plot").val(),
             genre: $("#update-genre").val(),
@@ -172,20 +172,24 @@ function addMovie() {
             id: $("#update-id").val()
 
         };
-        //alert(item.title + item.genre + item.plot + item.rating);
+       
 
         $.ajax({
-            url: uri + "/" + $("#update-id").val(), //add the row id to the uri
-            type: "PUT", //send it to the PUT controller
+            url: uri + "/" + $("#update-id").val(), //in uri add row id
+            type: "PUT", //use od POST type to pass it to the put Controller
             accepts: "application/json",
             contentType: "application/json",
-            data: JSON.stringify(item), //take the item data and pass it to the serever data is moved to server
+            data: JSON.stringify(item),
+            //To show error
             error: function (jqXHR, textStatus, errorThrown) {
+                //show alert if there is an error
                 alert("Something went wrong!");
             },
+            //When succeceed
             success: function (result) {
+                //Show alert when updated
                 alert("Successfully updated");
-                LoadTable(); //load the table afresh
+                LoadTable(); //load the table 
             }
 
         });
