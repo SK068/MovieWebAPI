@@ -17,10 +17,10 @@ body {
     min-width: 1000px;
     box-shadow: 0 1px 1px rgba(0,0,0,.05);
 }
-
+/*linear-gradient( 45deg, #fe8d62b8, #7de4c6c9);*/
 .table-title {
     padding-bottom: 15px;
-    background: #435d7d;
+    background: linear-gradient( 45deg, #fe8d62b8, #7de4c6c9);
     color: #fff;
     padding: 16px 30px;
     min-width: 100%;
