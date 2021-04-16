@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace MovieWebAPI.Models
 {
+    //Modal Name
     public class Movies
     {
-        [Key]
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string  Plot { get; set; }
-        public string Genre { get; set; }
-        public int Rating { get; set; }
+        [Key]//primary key
+        public int Id { get; set; }//ID
+        public string Title { get; set; }//Movie's Title
+        public string  Plot { get; set; }//Movie's plot
+        public string Genre { get; set; }//Genre of movie
+        public int Rating { get; set; }//Ratings of Movie
 
     }
 }
